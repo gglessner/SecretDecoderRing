@@ -7,7 +7,7 @@ import base64
 
 # Toggle debug printing
 DEBUG = False  # Set to False to disable debug output
-VERSION = "1.0"
+VERSION = "1.1"
 
 print(r"""
   __                  _                         _            
@@ -27,6 +27,7 @@ def process_input(input_str, input_type="data"):
     For IV and key, tries base64 before string.
     For ciphertext, prioritizes base64 decoding, then hex, then string.
     No length enforcement for IV or key.
+    Detects if base64-decoded ciphertext is valid UTF-8 and prints a message.
     """
     if DEBUG:
         print(f"Debug: Input string = '{input_str}', length = {len(input_str)}")
@@ -55,6 +56,13 @@ def process_input(input_str, input_type="data"):
             result = base64.b64decode(input_str, validate=True)
             if DEBUG:
                 print(f"Debug: Base64 decoded to {len(result)} bytes: {result.hex()}")
+            # Check if the base64-decoded result is valid UTF-8
+            try:
+                utf8_decoded = result.decode('utf-8')
+                print(f"\nNOTE - Base64-decoded ciphertext is a valid UTF-8 string: {utf8_decoded}")
+            except UnicodeDecodeError:
+                if DEBUG:
+                    print("Debug: Base64-decoded ciphertext is not valid UTF-8")
             return result
         except base64.binascii.Error:
             if DEBUG:
@@ -143,7 +151,7 @@ except ValueError as e:
     exit(1)
 
 try:
-    print("\nNOTE - Key Common lengths: 16/24/32 bytes for AES, 1-56 bytes for Blowfish, 5-16 bytes for CAST5, 32 bytes for ChaCha20")
+    print("\nNOTE - Common key lengths: 16/24/32 bytes for AES, 1-56 bytes for Blowfish, 5-16 bytes for CAST5, 32 bytes for ChaCha20")
     key_input = input("\nEnter Key (string, hex with '0x' prefix, or base64): ").strip()
     if DEBUG:
         print(f"Debug: Raw key input length = {len(key_input)}")

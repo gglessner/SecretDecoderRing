@@ -17,9 +17,8 @@ Requirements
 - Encryption libraries (e.g., `pycryptodome` for AES, ChaCha20, etc.) as required by the loaded modules.
 - Directory `encryption_modules` containing Python modules with a `decrypt` function.
 
-usage: SecretDecoderRing.py [-h] [--iv IV] [--key KEY] [--null-iv] [--quiet] [--batch BATCH] [--ciphertext CIPHERTEXT]
-
-Examples:
+Examples
+--------
   Interactive mode:
     python SecretDecoderRing.py
 

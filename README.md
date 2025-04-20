@@ -19,11 +19,11 @@ Requirements
 
 Examples
 --------
-  Interactive mode:
+- Interactive mode:
     python SecretDecoderRing.py
 
-  Batch mode with null IV and Key:
+- Batch mode with null IV and Key:
     python SecretDecoderRing.py --batch ciphertexts.txt --null-iv --key AAAAAAAAAAAAAAAA
 
-  Single ciphertext with quiet mode:
+- Single ciphertext with quiet mode:
     python SecretDecoderRing.py --ciphertext TXlzZWNyZXRwYXNzd29yZAo= --null-iv --key AAAAAAAAAAAAAAAA --quiet

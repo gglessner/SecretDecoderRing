@@ -23,7 +23,6 @@ parser = argparse.ArgumentParser(
   Single ciphertext with quiet mode:
     python SecretDecoderRing.py --ciphertext TXlzZWNyZXRwYXNzd29yZAo= --null-iv --key AAAAAAAAAAAAAAAA --quiet
 
-
 """,
     formatter_class=argparse.RawDescriptionHelpFormatter
 )

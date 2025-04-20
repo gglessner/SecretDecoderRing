@@ -21,16 +21,6 @@ usage: SecretDecoderRing.py [-h] [--iv IV] [--key KEY] [--null-iv] [--quiet] [--
 
 SecretDecoderRing - Decrypt ciphertexts using various encryption modules.
 
-options:
-  -h, --help            show this help message and exit
-  --iv IV               IV/nonce (string, hex with '0x' prefix, or base64)
-  --key KEY             Key (string, hex with '0x' prefix, or base64)
-  --null-iv             Use default null IV (16 zero bytes)
-  --quiet               Only print successful decryption results and UTF-8 notes
-  --batch BATCH         Path to a file containing multiple ciphertexts, one per line.
-  --ciphertext CIPHERTEXT
-                        Single ciphertext to decrypt (string, hex with '0x' prefix, or base64)
-
 Examples:
   Interactive mode:
     python SecretDecoderRing.py

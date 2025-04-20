@@ -20,10 +20,10 @@ Requirements
 Examples
 --------
 - Interactive mode:
--- ./SecretDecoderRing.py
+```./SecretDecoderRing.py```
 
 - Batch mode with null IV and Key:
--- ./SecretDecoderRing.py --batch ciphertexts.txt --null-iv --key AAAAAAAAAAAAAAAA
+```./SecretDecoderRing.py --batch ciphertexts.txt --null-iv --key AAAAAAAAAAAAAAAA```
 
 - Single ciphertext with quiet mode:
--- ./SecretDecoderRing.py --ciphertext TXlzZWNyZXRwYXNzd29yZAo= --null-iv --key AAAAAAAAAAAAAAAA --quiet
+```./SecretDecoderRing.py --ciphertext TXlzZWNyZXRwYXNzd29yZAo= --null-iv --key AAAAAAAAAAAAAAAA --quiet```

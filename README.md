@@ -19,8 +19,6 @@ Requirements
 
 usage: SecretDecoderRing.py [-h] [--iv IV] [--key KEY] [--null-iv] [--quiet] [--batch BATCH] [--ciphertext CIPHERTEXT]
 
-SecretDecoderRing - Decrypt ciphertexts using various encryption modules.
-
 Examples:
   Interactive mode:
     python SecretDecoderRing.py

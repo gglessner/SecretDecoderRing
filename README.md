@@ -17,3 +17,26 @@ Requirements
 - Encryption libraries (e.g., `pycryptodome` for AES, ChaCha20, etc.) as required by the loaded modules.
 - Directory `encryption_modules` containing Python modules with a `decrypt` function.
 
+usage: SecretDecoderRing.py [-h] [--iv IV] [--key KEY] [--null-iv] [--quiet] [--batch BATCH] [--ciphertext CIPHERTEXT]
+
+SecretDecoderRing - Decrypt ciphertexts using various encryption modules.
+
+options:
+  -h, --help            show this help message and exit
+  --iv IV               IV/nonce (string, hex with '0x' prefix, or base64)
+  --key KEY             Key (string, hex with '0x' prefix, or base64)
+  --null-iv             Use default null IV (16 zero bytes)
+  --quiet               Only print successful decryption results and UTF-8 notes
+  --batch BATCH         Path to a file containing multiple ciphertexts, one per line.
+  --ciphertext CIPHERTEXT
+                        Single ciphertext to decrypt (string, hex with '0x' prefix, or base64)
+
+Examples:
+  Interactive mode:
+    python SecretDecoderRing.py
+
+  Batch mode with null IV and Key:
+    python SecretDecoderRing.py --batch ciphertexts.txt --null-iv --key AAAAAAAAAAAAAAAA
+
+  Single ciphertext with quiet mode:
+    python SecretDecoderRing.py --ciphertext TXlzZWNyZXRwYXNzd29yZAo= --null-iv --key AAAAAAAAAAAAAAAA --quiet

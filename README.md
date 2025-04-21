@@ -5,11 +5,14 @@ This Python script is designed for penetration testers to decrypt encrypted pass
 
 Features
 --------
+- User-Friendly Interface: Supports interactive mode with clear prompts and error messages for manual use.
 - Flexible Input Handling: Accepts IV, key, and ciphertext as strings, hex (with `0x` prefix), or base64-encoded data.
 - Dynamic Module Loading: Automatically loads decryption modules from the `encryption_modules` directory, allowing easy extension with new algorithms.
 - Multiple Algorithm Support: Attempts decryption with all loaded modules, supporting various algorithms (e.g., AES, 3DES, Blowfish, CAST5, ChaCha20) and modes.
-- Debug Mode: Optional debug output for troubleshooting input processing.
+- Batch Processing: Decrypts multiple ciphertexts from a file using the `--batch` option, processing each line as a separate ciphertext.
 - UTF-8 Validation: Only outputs plaintext that is valid UTF-8, avoiding garbage data.
+- Quiet Mode: Suppresses non-essential output with `--quiet`, printing only successful decryption results and UTF-8 notes for scripting or automation.
+- Debug Mode: Optional debug output for troubleshooting input processing.
 
 Requirements
 ------------

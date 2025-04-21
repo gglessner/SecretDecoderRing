@@ -1,4 +1,4 @@
-SecretDecoderRing - Multi-Algorithm Decryption Tool
+SecretDecoderRing - Modular Multi-Algorithm Decryption Tool
 ===================================================
 
 This Python script is designed for penetration testers to decrypt encrypted passwords or data when encryption keys are discovered, without prior knowledge of the encryption algorithm or mode. It supports multiple encryption algorithms by dynamically loading modules from an `encryption_modules` directory and attempts decryption with each module using provided initialization vector (IV)/nonce, key, and ciphertext inputs.
@@ -7,7 +7,7 @@ Features
 --------
 - Flexible Input Handling: Accepts IV, key, and ciphertext as strings, hex (with `0x` prefix), or base64-encoded data.
 - Dynamic Module Loading: Automatically loads decryption modules from the `encryption_modules` directory, allowing easy extension with new algorithms.
-- Multiple Algorithm Support: Attempts decryption with all loaded modules, supporting various algorithms (e.g., AES, Blowfish, CAST5, ChaCha20) and modes.
+- Multiple Algorithm Support: Attempts decryption with all loaded modules, supporting various algorithms (e.g., AES, 3DES, Blowfish, CAST5, ChaCha20) and modes.
 - Debug Mode: Optional debug output for troubleshooting input processing.
 - UTF-8 Validation: Only outputs plaintext that is valid UTF-8, avoiding garbage data.
 

@@ -1,5 +1,5 @@
-SecretDecoderRing - Modular Multi-Algorithm Decryption Tool
-===================================================
+SecretDecoderRing - Modular Multi-Algorithm Decryption Tool For Penetration Testers
+===================================================================================
 
 This Python script is designed for penetration testers to decrypt encrypted passwords or data when encryption keys are discovered, without prior knowledge of the encryption algorithm or mode. It supports multiple encryption algorithms by dynamically loading modules from an `encryption_modules` directory and attempts decryption with each module using provided initialization vector (IV)/nonce, key, and ciphertext inputs.
 

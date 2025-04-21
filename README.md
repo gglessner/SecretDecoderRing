@@ -11,6 +11,7 @@ Features
 - Multiple Algorithm Support: Attempts decryption with all loaded modules, supporting various algorithms (e.g., AES, 3DES, Blowfish, CAST5, ChaCha20) and modes.
 - Batch Processing: Decrypts multiple ciphertexts from a file using the `--batch` option, processing each line as a separate ciphertext.
 - UTF-8 Validation: Only outputs plaintext that is valid UTF-8, avoiding garbage data.
+- Base64 Detection: Automatically detects if the ciphertext is plain base64-encoded data (not encrypted) and alerts the user.
 - Quiet Mode: Suppresses non-essential output with `--quiet`, printing only successful decryption results and UTF-8 notes for scripting or automation.
 - Debug Mode: Optional debug output for troubleshooting input processing.
 

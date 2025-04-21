@@ -28,7 +28,7 @@ Examples
 
 - Batch mode with null IV and Key:\
 \
-```./SecretDecoderRing.py --batch ciphertexts.txt --null-iv --key AAAAAAAAAAAAAAAA```
+```python SecretDecoderRing.py --batch ciphertexts.txt --null-iv --key LW5BQkNERUZHSElKS0xNTk9QCg==```
 
 - Single ciphertext with quiet mode:\
 \

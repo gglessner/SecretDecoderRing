@@ -8,9 +8,13 @@ import argparse
 
 # Toggle debug printing
 DEBUG = False  # Set to False to disable debug output
-VERSION = "1.2"
+VERSION = "1.3"
 
-# Argument parsing with examples in help message (unchanged)
+class CustomHelpFormatter(argparse.RawDescriptionHelpFormatter):
+    def format_help(self):
+        return '\n' + super().format_help() + '\n'
+
+# Argument parsing with examples in help message
 parser = argparse.ArgumentParser(
     description="SecretDecoderRing - Decrypt ciphertexts using various encryption modules.",
     epilog="""Examples:
@@ -18,23 +22,22 @@ parser = argparse.ArgumentParser(
     python SecretDecoderRing.py
 
   Batch mode with null IV and Key:
-    python SecretDecoderRing.py --batch ciphertexts.txt --null-iv --key AAAAAAAAAAAAAAAA
+    python SecretDecoderRing.py --batch ciphertexts.txt --null-iv --key LW5BQkNERUZHSElKS0xNTk9QCg==
 
   Single ciphertext with quiet mode:
     python SecretDecoderRing.py --ciphertext TXlzZWNyZXRwYXNzd29yZAo= --null-iv --key AAAAAAAAAAAAAAAA --quiet
-
 """,
-    formatter_class=argparse.RawDescriptionHelpFormatter
+    formatter_class=CustomHelpFormatter
 )
 parser.add_argument('--iv', help="IV/nonce (string, hex with '0x' prefix, or base64)")
 parser.add_argument('--key', help="Key (string, hex with '0x' prefix, or base64)")
 parser.add_argument('--null-iv', action='store_true', help="Use default null IV (16 zero bytes)")
 parser.add_argument('--quiet', action='store_true', help="Only print successful decryption results and UTF-8 notes")
 parser.add_argument('--batch', help="Path to a file containing multiple ciphertexts, one per line.")
-parser.add_argument('--ciphertext', help="Single ciphertext to decrypt (string, hex with '0x' prefix, or base64)")
+parser.add_argument('--ciphertext', metavar='CIPHER', help="Single ciphertext to decrypt (string, hex with '0x' prefix, or base64)")
 args = parser.parse_args()
 
-# Print the banner only if not in quiet mode (unchanged)
+# Print the banner only if not in quiet mode
 if not args.quiet:
     print(r"""
   __                  _                         _            
@@ -128,7 +131,7 @@ def process_input(input_str, input_type="data"):
         print(f"Debug: String encoded to {len(result)} bytes: {result.hex()}")
     return result, None
 
-# Load encryption modules from the 'encryption_modules' directory (unchanged)
+# Load encryption modules from the 'encryption_modules' directory
 modules_dir = 'encryption_modules'
 modules = []
 
@@ -276,10 +279,10 @@ elif args.batch:
 else:
     # Interactive mode
     if not args.quiet:
-        print("\nNow enter ciphertexts to decrypt. Press Enter with no input to quit.")
+        print("\nNow enter ciphertexts to decrypt. Press Enter with no input to quit.\n")
     while True:
         try:
-            ciphertext_input = input("\nEnter ciphertext (string, hex with '0x' prefix, or base64): ").strip()
+            ciphertext_input = input("Enter ciphertext (string, hex with '0x' prefix, or base64): ").strip()
             if not ciphertext_input:
                 break
             ciphertext, note = process_input(ciphertext_input, "ciphertext")
@@ -318,4 +321,4 @@ else:
                 print()
 
 if not args.quiet:
-    print("Exiting...")
+    print("\nExiting...\n")

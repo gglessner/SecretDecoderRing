@@ -159,7 +159,8 @@ if args.key:
     key, _ = process_input(args.key, "key")
 else:
     while True:
-        print("\nNOTE - Common key lengths: 16/24/32 bytes for AES, 1-56 bytes for Blowfish, 5-16 bytes for CAST5, 32 bytes for ChaCha20")
+        if not args.quiet:
+            print("\nNOTE - Common key lengths: 16/24/32 bytes for AES, 1-56 bytes for Blowfish, 5-16 bytes for CAST5, 32 bytes for ChaCha20")
         key_input = input("\nEnter Key (string, hex with '0x' prefix, or base64): ").strip()
         if key_input:
             key, _ = process_input(key_input, "key")

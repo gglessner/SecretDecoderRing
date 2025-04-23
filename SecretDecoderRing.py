@@ -8,7 +8,7 @@ import argparse
 
 # Toggle debug printing
 DEBUG = False  # Set to False to disable debug output
-VERSION = "1.3.1"
+VERSION = "1.3.2"
 
 class CustomHelpFormatter(argparse.RawDescriptionHelpFormatter):
     def format_help(self):
@@ -51,50 +51,56 @@ def is_hex(s):
     return bool(re.match(r'^[0-9a-fA-F]+$', s)) and len(s) % 2 == 0
 
 def process_input(input_str, input_type="data"):
-    if DEBUG and not args.quiet:
-        print(f"Debug: Input string = '{input_str}', length = {len(input_str)}")
-
-    if not input_str and input_type == "iv":
-        return b'\x00' * 16, None
-
+    """
+    Process input string based on its type (key, iv, ciphertext, etc.).
+    Returns a tuple of (processed_bytes, note).
+    """
+    # Handle hex input if it starts with '0x'
     if input_str.startswith('0x'):
         try:
             hex_str = input_str[2:]
-            if is_hex(hex_str):
+            if all(c in '0123456789abcdefABCDEF' for c in hex_str):
                 result = bytes.fromhex(hex_str)
                 return result, None
+            else:
+                raise ValueError("Invalid hex characters")
         except ValueError as e:
             raise ValueError(f"Invalid hex input: {e}")
 
-    if input_type == "ciphertext":
+    # Special handling for keys
+    if input_type == "key":
         try:
+            # Attempt base64 decoding
             result = base64.b64decode(input_str, validate=True)
-            note = None
+            # Define standard key lengths (e.g., for AES)
+            standard_lengths = [16, 24, 32]
+            if len(result) in standard_lengths:
+                # If length is standard, use the base64-decoded bytes
+                return result, None
+            else:
+                # Non-standard length, assume ASCII and encode as UTF-8
+                result = input_str.encode('utf-8')
+                return result, None
+        except base64.binascii.Error:
+            # Base64 decoding failed, assume ASCII and encode as UTF-8
+            result = input_str.encode('utf-8')
+            return result, None
+
+    # Handling for IV or ciphertext (preserve original logic)
+    try:
+        result = base64.b64decode(input_str, validate=True)
+        note = None
+        if input_type == "ciphertext":
             try:
                 utf8_decoded = result.decode('utf-8')
                 note = f"NOTE - Base64-decoded ciphertext is a valid UTF-8 string: '{utf8_decoded}'"
             except UnicodeDecodeError:
                 pass
-            return result, note
-        except base64.binascii.Error:
-            if is_hex(input_str):
-                try:
-                    result = bytes.fromhex(input_str)
-                    return result, None
-                except ValueError:
-                    pass
-            result = input_str.encode('utf-8')
-            return result, None
-
-    if input_type in ("iv", "key"):
-        try:
-            result = base64.b64decode(input_str, validate=True)
-            return result, None
-        except base64.binascii.Error:
-            pass
-
-    result = input_str.encode('utf-8')
-    return result, None
+        return result, note
+    except base64.binascii.Error:
+        # Fallback to UTF-8 encoding for non-base64 inputs
+        result = input_str.encode('utf-8')
+        return result, None
 
 modules_dir = 'encryption_modules'
 modules = []

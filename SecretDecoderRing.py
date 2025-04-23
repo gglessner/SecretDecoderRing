@@ -8,7 +8,7 @@ import argparse
 
 # Toggle debug printing
 DEBUG = False  # Set to False to disable debug output
-VERSION = "1.3"
+VERSION = "1.3.1"
 
 class CustomHelpFormatter(argparse.RawDescriptionHelpFormatter):
     def format_help(self):
@@ -47,91 +47,55 @@ if not args.quiet:
     print(f"Version: {VERSION}\n")
 
 def is_hex(s):
-    """Check if the string is a valid hex string, optionally with '0x' prefix."""
     s = s[2:] if s.startswith('0x') else s
     return bool(re.match(r'^[0-9a-fA-F]+$', s)) and len(s) % 2 == 0
 
 def process_input(input_str, input_type="data"):
-    """
-    Convert user input to bytes from string, hex, or base64.
-    Returns a tuple (data_bytes, note), where note is a string if applicable, else None.
-    For IV and key, tries base64 before string, note is always None.
-    For ciphertext, tries base64, then hex, then string; sets note if base64 decodes to valid UTF-8.
-    """
     if DEBUG and not args.quiet:
         print(f"Debug: Input string = '{input_str}', length = {len(input_str)}")
-    
-    # Handle empty input for IV
+
     if not input_str and input_type == "iv":
-        if DEBUG and not args.quiet:
-            print("Debug: Empty IV, returning 16 zero bytes")
         return b'\x00' * 16, None
 
-    # Try hex if it starts with '0x'
     if input_str.startswith('0x'):
         try:
-            hex_str = input_str[2:]  # Remove '0x'
+            hex_str = input_str[2:]
             if is_hex(hex_str):
                 result = bytes.fromhex(hex_str)
-                if DEBUG and not args.quiet:
-                    print(f"Debug: Hex decoded to {len(result)} bytes: {result.hex()}")
                 return result, None
         except ValueError as e:
             raise ValueError(f"Invalid hex input: {e}")
 
-    # For ciphertext, prioritize base64 decoding
     if input_type == "ciphertext":
         try:
             result = base64.b64decode(input_str, validate=True)
-            if DEBUG and not args.quiet:
-                print(f"Debug: Base64 decoded to {len(result)} bytes: {result.hex()}")
-            # Check if the base64-decoded result is valid UTF-8
             note = None
             try:
                 utf8_decoded = result.decode('utf-8')
                 note = f"NOTE - Base64-decoded ciphertext is a valid UTF-8 string: '{utf8_decoded}'"
             except UnicodeDecodeError:
-                if DEBUG and not args.quiet:
-                    print("Debug: Base64-decoded ciphertext is not valid UTF-8")
+                pass
             return result, note
         except base64.binascii.Error:
-            if DEBUG and not args.quiet:
-                print("Debug: Base64 decoding failed for ciphertext, trying hex")
-            # Fallback to hex if base64 fails
             if is_hex(input_str):
                 try:
                     result = bytes.fromhex(input_str)
-                    if DEBUG and not args.quiet:
-                        print(f"Debug: Hex decoded to {len(result)} bytes: {result.hex()}")
                     return result, None
                 except ValueError:
-                    if DEBUG and not args.quiet:
-                        print("Debug: Hex decoding failed, treating as string")
-            # Last resort: treat as plain string
+                    pass
             result = input_str.encode('utf-8')
-            if DEBUG and not args.quiet:
-                print(f"Debug: String encoded to {len(result)} bytes: {result.hex()}")
             return result, None
 
-    # Try base64 for IV or key
     if input_type in ("iv", "key"):
         try:
             result = base64.b64decode(input_str, validate=True)
-            if DEBUG and not args.quiet:
-                print(f"Debug: Base64 decoded to {len(result)} bytes: {result.hex()}")
             return result, None
         except base64.binascii.Error:
-            if DEBUG and not args.quiet:
-                print("Debug: Base64 decoding failed, falling back to string")
-            # Fall through to string encoding
+            pass
 
-    # Default to string encoding for IV, key, or other input types
     result = input_str.encode('utf-8')
-    if DEBUG and not args.quiet:
-        print(f"Debug: String encoded to {len(result)} bytes: {result.hex()}")
     return result, None
 
-# Load encryption modules from the 'encryption_modules' directory
 modules_dir = 'encryption_modules'
 modules = []
 
@@ -168,7 +132,6 @@ if not modules:
 if not args.quiet:
     print(f"Loaded {len(modules)} encryption modules: {[m.__name__ for m in modules]}")
 
-# Handle IV
 if args.iv:
     iv, _ = process_input(args.iv, "iv")
 elif args.null_iv:
@@ -186,7 +149,6 @@ else:
 if not args.quiet:
     print(f"IV (hex): {iv.hex()} ({len(iv)} bytes)")
 
-# Handle Key
 if args.key:
     key, _ = process_input(args.key, "key")
 else:
@@ -201,10 +163,9 @@ else:
 if not args.quiet:
     print(f"Key (hex): {key.hex()} ({len(key)} bytes)")
 
-# Process ciphertexts
 if args.ciphertext:
-    # Single ciphertext mode
-    ciphertext, note = process_input(args.ciphertext, "ciphertext")
+    ciphertext_input = args.ciphertext
+    ciphertext, note = process_input(ciphertext_input, "ciphertext")
     if not args.quiet:
         print(f"Ciphertext (hex): {ciphertext.hex()} ({len(ciphertext)} bytes)")
     if note:
@@ -220,7 +181,7 @@ if args.ciphertext:
                     mode_str = f" in {mode} mode" if mode else ""
                     try:
                         decoded = plaintext.decode('utf-8')
-                        print(f"Decryption succeeded with {module.__name__}{mode_str}: {decoded}")
+                        print(f"Decryption succeeded with {module.__name__}{mode_str}: {decoded} [{ciphertext_input}]")
                         success = True
                     except UnicodeDecodeError:
                         if not args.quiet:
@@ -230,10 +191,7 @@ if args.ciphertext:
         except Exception as e:
             if not args.quiet:
                 print(f"Error in {module.__name__}: {e}")
-    if not success and not args.quiet:
-        print("No module could decrypt the ciphertext.")
 elif args.batch:
-    # Batch mode
     try:
         with open(args.batch, 'r') as f:
             for line_num, line in enumerate(f, start=1):
@@ -258,7 +216,7 @@ elif args.batch:
                                 mode_str = f" in {mode} mode" if mode else ""
                                 try:
                                     decoded = plaintext.decode('utf-8')
-                                    print(f"Decryption succeeded with {module.__name__}{mode_str}: {decoded}")
+                                    print(f"Decryption succeeded with {module.__name__}{mode_str}: {decoded} [{ciphertext_input}]")
                                     success = True
                                 except UnicodeDecodeError:
                                     if not args.quiet:
@@ -277,7 +235,6 @@ elif args.batch:
         if not args.quiet:
             print(f"Error reading file '{args.batch}': {e}")
 else:
-    # Interactive mode
     if not args.quiet:
         print("\nNow enter ciphertexts to decrypt. Press Enter with no input to quit.\n")
     while True:
@@ -301,7 +258,7 @@ else:
                             mode_str = f" in {mode} mode" if mode else ""
                             try:
                                 decoded = plaintext.decode('utf-8')
-                                print(f"Decryption succeeded with {module.__name__}{mode_str}: {decoded}")
+                                print(f"Decryption succeeded with {module.__name__}{mode_str}: {decoded} [{ciphertext_input}]")
                                 success = True
                             except UnicodeDecodeError:
                                 if not args.quiet:
